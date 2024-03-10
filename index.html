@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Kubernetes Disaster Recovery Solution - Velero</title>
+		<meta name="author" content="Nick Ma">
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css" id="theme">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/vs.css">
+
+		<!-- Disable capital letter in the headlines -->
+		<style>
+			.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5 {
+				text-transform: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-transition="concave">
+					<h3>Kubernetes Disaster Recovery Solution - Velero</h3>
+					<p>
+						<small>Nick Ma &lt;skywalker.nick@gmail.com&gt;</a></small><br>
+						<small>Date: 01/30/2024</small>
+					</p>
+				</section>
+				<section data-transition="concave">
+					<h3>Why Need Recovery Plan</h3>
+					<p>Mitigating unforeseen disruptions</p>
+					<p>Data protection and compliance</p>
+					<p>Minimizing financial losses</p>
+					<p>Improved business continuity</p>
+					<p>Enhanced preparedness and confidence</p>
+				</section>
+				<section data-transition="concave">
+					<h3>Use Cases in Kubernetes</h3>
+					<p>Disaster Recovery: rebuild, recover</p>
+					<p>Data Protection: data loss, data corruption, archival</p>
+					<p>Data Migration: move workloads from one cluster to another</p>
+				</section>
+				<section data-transition="concave">
+					<h3>What is Velero</h3>
+					<div style="width: 100%;">
+						<div style="width: 60%; height: 200px; float: left;">
+							<p>Velero is an open source tool to safely back up, recover, and migrate 
+							   Kubernetes clusters and volumes.</p>
+						</div>
+						<div style="width: 40%; height: 300px; float: left;">
+							<img src="images/velero.png" alt="Velero logo"/>
+						</div>
+					</div>
+				</section>
+				<section>
+					<section data-transition="concave">
+						<h3>Protect Data in Kubernetes</h3>
+						<p>Stateless Application</p>
+						<small>Isolate unhealthy nodes</small><br/>
+						<small>Provision replacement nodes</small><br/>
+						<p>Note: solve with automation</p>
+					</section>
+					<section data-transition="concave">
+						<h3>Protect Data in Kubernetes</h3>
+						<p>Stateful Application</p>
+						<small>Database applications</small><br/>
+						<small>Persistent volumes</small><br/>
+						<small>Persistent file systems</small><br/>
+						<p>Note: this is why we are here.</p>
+					</section>
+				</section>
+				<section>
+					<section data-transition="concave">
+						<h3>Features in Velero</h3>
+						<p>Backup and restore Kubernetes objects</p>
+						<small>Uses Kubernetes Discovery API</small><br/>
+						<small>Backups stored in Cloud Object Storage</small><br/>
+						<small>Storage Plugins: AWS, GCP, Azure, VMware, and more</small>
+					</section>
+					<section data-transition="concave">
+						<h3>Features in Velero</h3>
+						<p>Backup and restore Kubernetes volumes</p>
+						<small>Uses Cloud Snapshot API</small><br/>
+						<small>Uses node-agent for file system backups</small><br/>
+					</section>
+					<section data-transition="concave">
+						<h3>Features in Velero</h3>
+						<p>Scheduled backups, resource filtering, restoring to different namespaces, and more</p>
+					</section>
+				</section>
+				<section data-transition="concave">
+					<h3>Velero Workflow</h3>
+					<img src="images/velero-architecture.drawio.png" alt="Velero architecture" style="width: 55vw; min-width: 400px;"/>
+				</section>
+				<section data-transition="concave">
+					<h3>Velero Installation</h3>
+					<pre><code data-trim data-noescape>
+						velero install \
+							--use-node-agent \
+							--privileged-node-agent \
+							--provider aws \
+							--plugins velero/velero-plugin-for-aws:v1.8.2 \
+							--secret-file {aws-iam-user-credential} \
+							--bucket {aws-s3-bucket-name} \
+							--backup-location-config region=ap-northeast-1 \
+							--snapshot-location-config region=ap-northeast-1
+					</code></pre>
+				</section>
+				<section data-transition="concave">
+					<h3>Velero Demo in K8S</h3>
+					<ol>
+						<li>Apply Nginx deployment including EBS</li>
+						<li>Velero backup</li>
+						<li>Destroy Nginx deployment</li>
+						<li>Velero restore</li>
+						<li>Verify restored Nginx deployment</li>
+					</ol>
+					<p>Note: check demo folder.</p>
+				</section>
+				<section data-transition="concave">
+					<h3>Summary</h3>
+					<p>Velero Project: <a href="https://velero.io/">https://velero.io</a></p>
+					<p>Community Discussion: <a href="https://kubernetes.slack.com/messages/velero-users">Slack #velero-users</a></p>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				// The "normal" size of the presentation, aspect ratio will
+				// be preserved when the presentation is scaled to fit different
+				// resolutions. Can be specified using percentage units.
+				width: 1024,
+				height: 768,
+
+				// Factor of the display size that should remain empty around
+				// the content
+				margin: 0.04,
+
+				// Bounds for smallest/largest possible scale to apply to content
+				minScale: 0.2,
+				maxScale: 4.0,
+
+				hash: true,
+				slideNumber: 'c/t',
+				controlsLayout: 'edges',
+				controls: true,
+				progress: true,
+				center: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+		<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+		<script type="text/javascript">
+			// On Reveal.js ready event, copy header/footer <div> into each `.slide-background` <div>
+			var header = $('#header').html();
+			if ( window.location.search.match( /print-pdf/gi ) ) {
+				Reveal.addEventListener( 'ready', function( event ) {
+					$('.slide-background').append(header);
+				});
+			}
+			else {
+				$('div.reveal').append(header);
+			}
+		</script>
+	</body>
+</html>
